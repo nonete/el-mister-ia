@@ -66,7 +66,49 @@ def orden_posicion(posicion):
     return orden.index(posicion) if posicion in orden else len(orden)
 
 
-# ---------- Broma: modo Cholo para el Atlético ----------
+# ---------- Bromas ----------
+
+def svg_en_base64(nombre_archivo):
+    """Lee un dibujo SVG del repositorio y lo convierte a base64,
+    para poder mostrarlo dentro de la página con una etiqueta <img>."""
+    ruta = Path(__file__).parent / nombre_archivo
+    return base64.b64encode(ruta.read_bytes()).decode()
+
+
+# Broma 1: tormenta sobre el escudo del Barça
+
+BARCELONA_ID = 81  # id del FC Barcelona en football-data.org
+
+
+def es_barcelona(equipo):
+    return equipo.get("id") == BARCELONA_ID or "Barcelona" in equipo.get("name", "")
+
+
+def mostrar_tormenta(escudo):
+    rayo_b64 = svg_en_base64("rayo.svg")
+    # La animación CSS hace que el rayo parpadee y que el escudo "tiemble".
+    st.markdown(
+        f"""
+        <style>
+          @keyframes destello {{ 0%,60%,100% {{opacity:1}} 30%,80% {{opacity:0.15}} }}
+          @keyframes temblor  {{ 0%,100% {{transform:translateX(0)}}
+                                 25% {{transform:translateX(-4px)}} 75% {{transform:translateX(4px)}} }}
+          .tormenta {{ text-align:center; padding:12px; border-radius:16px;
+                       background:linear-gradient(#1c1f2b,#3a3f52); }}
+          .tormenta .rayo   {{ animation: destello 1.2s infinite; display:block; margin:0 auto -30px; }}
+          .tormenta .escudo {{ animation: temblor 0.3s infinite; }}
+        </style>
+        <div class="tormenta">
+          <img class="rayo" src="data:image/svg+xml;base64,{rayo_b64}" width="160">
+          <img class="escudo" src="{escudo}" width="90">
+          <p style="color:white; margin:8px 0 0;">⛈️ Alerta meteorológica en Can Barça ⛈️</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# Broma 2: modo Cholo para el Atlético
 
 ATLETICO_ID = 78  # id del Atlético de Madrid en football-data.org
 
@@ -77,10 +119,7 @@ def es_atletico(equipo):
 
 def mostrar_modo_cholo():
     st.balloons()
-    # La mascota es un SVG (dibujo hecho con código). Lo convertimos a base64
-    # para poder mostrarlo dentro de la página con una etiqueta <img>.
-    ruta = Path(__file__).parent / "mascota.svg"
-    svg_b64 = base64.b64encode(ruta.read_bytes()).decode()
+    svg_b64 = svg_en_base64("mascota.svg")
     st.markdown(
         f"""
         <div style="text-align:center; padding:16px; border-radius:16px;
@@ -153,7 +192,9 @@ def mostrar_equipo(equipo_id):
     if es_atletico(equipo):
         mostrar_modo_cholo()
 
-    if equipo.get("crest"):
+    if es_barcelona(equipo):
+        mostrar_tormenta(equipo.get("crest"))
+    elif equipo.get("crest"):
         st.markdown(f'<img src="{equipo["crest"]}" width="72">', unsafe_allow_html=True)
     st.title(equipo.get("name", "Equipo"))
 
