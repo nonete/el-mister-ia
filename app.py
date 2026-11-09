@@ -148,7 +148,19 @@ def mostrar_clasificacion():
         st.error(f"No he podido cargar la clasificación: {e}")
         return
 
-    st.caption("Toca un equipo para ver su plantilla.")
+    # En el móvil es más cómodo un desplegable que tocar la casilla de la tabla
+    equipos = {f["team"]["shortName"]: f["team"]["id"] for f in tabla}
+    elegido = st.selectbox(
+        "Ver plantilla de:",
+        list(equipos),
+        index=None,
+        placeholder="Elige un equipo...",
+    )
+    if elegido:
+        st.query_params["equipo"] = str(equipos[elegido])
+        st.rerun()
+
+    st.caption("También puedes tocar la casilla de la izquierda de cada equipo.")
     filas = [
         {
             "Pos": f["position"],
