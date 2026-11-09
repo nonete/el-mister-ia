@@ -108,6 +108,30 @@ def mostrar_tormenta(escudo):
     )
 
 
+# Broma 3: Quel disfrutando del Real Madrid
+
+MADRID_ID = 86  # id del Real Madrid en football-data.org
+
+
+def es_madrid(equipo):
+    return equipo.get("id") == MADRID_ID or "Real Madrid" in equipo.get("name", "")
+
+
+def mostrar_quel():
+    st.snow()  # lluvia de copos blancos
+    svg_b64 = svg_en_base64("aficionado.svg")
+    st.markdown(
+        f"""
+        <div style="text-align:center; padding:16px; border-radius:16px;
+                    background:linear-gradient(135deg,#ffffff,#e8e2fa); border:2px solid #7b5cd6;">
+          <img src="data:image/svg+xml;base64,{svg_b64}" width="180">
+          <h3 style="color:#3a3a4a; margin:4px 0 0;">Quel disfrutando del Real Madrid 🤍</h3>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 # Broma 2: modo Cholo para el Atlético
 
 ATLETICO_ID = 78  # id del Atlético de Madrid en football-data.org
@@ -203,6 +227,8 @@ def mostrar_equipo(equipo_id):
 
     if es_atletico(equipo):
         mostrar_modo_cholo()
+    elif es_madrid(equipo):
+        mostrar_quel()
 
     if es_barcelona(equipo):
         mostrar_tormenta(equipo.get("crest"))
