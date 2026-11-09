@@ -1,4 +1,6 @@
+import base64
 from datetime import date
+from pathlib import Path
 
 import requests
 import streamlit as st
@@ -64,6 +66,34 @@ def orden_posicion(posicion):
     return orden.index(posicion) if posicion in orden else len(orden)
 
 
+# ---------- Broma: modo Cholo para el Atlético ----------
+
+ATLETICO_ID = 78  # id del Atlético de Madrid en football-data.org
+
+
+def es_atletico(equipo):
+    return equipo.get("id") == ATLETICO_ID or "Atlético" in equipo.get("name", "")
+
+
+def mostrar_modo_cholo():
+    st.balloons()
+    # La mascota es un SVG (dibujo hecho con código). Lo convertimos a base64
+    # para poder mostrarlo dentro de la página con una etiqueta <img>.
+    ruta = Path(__file__).parent / "mascota.svg"
+    svg_b64 = base64.b64encode(ruta.read_bytes()).decode()
+    st.markdown(
+        f"""
+        <div style="text-align:center; padding:16px; border-radius:16px;
+                    background:linear-gradient(135deg,#d81e2c,#1f3a93); color:white;">
+          <h2 style="color:white; margin:0;">🏆 Modo Cholo activado 🏆</h2>
+          <img src="data:image/svg+xml;base64,{svg_b64}" width="180">
+          <p style="font-size:1.3em; margin:0;"><b>Partido a partido</b> 💪</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 # ---------- Páginas ----------
 
 def mostrar_clasificacion():
@@ -119,6 +149,9 @@ def mostrar_equipo(equipo_id):
     except Exception as e:
         st.error(f"No he podido cargar el equipo: {e}")
         return
+
+    if es_atletico(equipo):
+        mostrar_modo_cholo()
 
     if equipo.get("crest"):
         st.markdown(f'<img src="{equipo["crest"]}" width="72">', unsafe_allow_html=True)
